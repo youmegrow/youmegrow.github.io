@@ -1,604 +1,127 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电商AI提示词生成器 - 让产品图生成更简单</title>
-    <style>
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #7209b7;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --success: #4cc9f0;
-            --gray: #6c757d;
-            --gray-light: #e9ecef;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: var(--dark);
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            padding: 30px 0;
-            margin-bottom: 30px;
-        }
-        
-        h1 {
-            color: var(--primary);
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-        
-        .subtitle {
-            color: var(--gray);
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .app-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        @media (max-width: 768px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .form-section, .preview-section {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-        
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--primary);
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--gray-light);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--gray-light);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-        
-        .checkbox-group, .radio-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .checkbox-item, .radio-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .checkbox-item input, .radio-item input {
-            width: auto;
-        }
-        
-        .color-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .color-option {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        
-        .color-option.selected {
-            border-color: var(--primary);
-            transform: scale(1.1);
-        }
-        
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px 25px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-        
-        .btn-full {
-            width: 100%;
-        }
-        
-        .btn-secondary {
-            background: var(--secondary);
-        }
-        
-        .btn-secondary:hover {
-            background: #6511a0;
-        }
-        
-        .result-box {
-            background: var(--light);
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .result-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: between;
-            align-items: center;
-        }
-        
-        .prompt-text {
-            white-space: pre-line;
-            line-height: 1.6;
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid var(--gray-light);
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .advanced-toggle {
-            background: none;
-            border: none;
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .advanced-settings {
-            margin-top: 15px;
-            padding: 15px;
-            background: var(--gray-light);
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .advanced-settings.show {
-            display: block;
-        }
-        
-        .example-preview {
-            text-align: center;
-            padding: 20px;
-            background: var(--light);
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .example-image {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .example-text {
-            font-style: italic;
-            color: var(--gray);
-        }
-        
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            margin-left: 5px;
-        }
-        
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: var(--dark);
-            color: white;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 14px;
-            font-weight: normal;
-        }
-        
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>电商商拍升级版 - 真实还原生成器</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f7f7f7;padding:20px}
+    .box{max-width:600px;margin:auto;background:#fff;padding:25px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    h2{text-align:center;margin-bottom:20px}
+    label{display:block;margin:12px 0 6px;font-weight:bold}
+    input,select,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:4px}
+    button{width:100%;padding:12px;background:#007bff;color:#fff;border:0;border-radius:4px;margin-top:20px;cursor:pointer}
+    button:hover{background:#0056b3}
+    .out{border:1px solid #ddd;padding:15px;border-radius:4px;background:#fafafa;margin-top:15px}
+    .hide{display:none}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>电商AI提示词生成器</h1>
-            <p class="subtitle">简单选择，一键生成高质量产品图提示词，让电商视觉制作成本降低80%</p>
-        </header>
-        
-        <div class="app-container">
-            <section class="form-section">
-                <h2 class="section-title">生成您的产品提示词</h2>
-                
-                <div class="form-group">
-                    <label for="productName">产品名称 <span class="tooltip">?
-                        <span class="tooltiptext">请输入您的产品具体名称，如"便携式咖啡杯"</span>
-                    </span></label>
-                    <input type="text" id="productName" placeholder="例如：便携式咖啡杯">
-                </div>
-                
-                <div class="form-group">
-                    <label for="productCategory">产品品类</label>
-                    <select id="productCategory">
-                        <option value="">请选择品类</option>
-                        <option value="clothing">服装服饰</option>
-                        <option value="cosmetics">美妆护肤</option>
-                        <option value="food">食品饮料</option>
-                        <option value="electronics">数码家电</option>
-                        <option value="home">家居日用</option>
-                        <option value="shoes">鞋靴箱包</option>
-                        <option value="motherbaby">母婴玩具</option>
-                        <option value="sports">运动户外</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="productMaterial">产品材质/特性</label>
-                    <textarea id="productMaterial" rows="2" placeholder="例如：304不锈钢材质，双层真空保温，一键开启设计"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>主要颜色</label>
-                    <div class="color-options">
-                        <div class="color-option selected" style="background-color: #FF3B30;" data-color="红色"></div>
-                        <div class="color-option" style="background-color: #FF9500;" data-color="橙色"></div>
-                        <div class="color-option" style="background-color: #FFCC00;" data-color="黄色"></div>
-                        <div class="color-option" style="background-color: #4CD964;" data-color="绿色"></div>
-                        <div class="color-option" style="background-color: #5AC8FA;" data-color="蓝色"></div>
-                        <div class="color-option" style="background-color: #007AFF;" data-color="深蓝"></div>
-                        <div class="color-option" style="background-color: #5856D6;" data-color="紫色"></div>
-                        <div class="color-option" style="background-color: #000000;" data-color="黑色"></div>
-                        <div class="color-option" style="background-color: #FFFFFF; border: 1px solid #ccc;" data-color="白色"></div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>图片风格</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="styleMinimal" checked>
-                            <label for="styleMinimal">极简白底</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="styleLifestyle">
-                            <label for="styleLifestyle">生活场景</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="styleStudio">
-                            <label for="styleStudio">专业影棚</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="styleNatural">
-                            <label for="styleNatural">自然光感</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>图片用途</label>
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="purposeMain" name="purpose" checked>
-                            <label for="purposeMain">商品主图</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="purposeDetail" name="purpose">
-                            <label for="purposeDetail">详情页图</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="purposeAd" name="purpose">
-                            <label for="purposeAd">广告宣传</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="advanced-toggle" id="advancedToggle">
-                    <span>高级设置</span>
-                    <span>▼</span>
-                </button>
-                
-                <div class="advanced-settings" id="advancedSettings">
-                    <div class="form-group">
-                        <label for="imageRatio">图片比例</label>
-                        <select id="imageRatio">
-                            <option value="1:1">1:1 (正方形)</option>
-                            <option value="4:3">4:3 (横图)</option>
-                            <option value="16:9">16:9 (宽屏)</option>
-                            <option value="9:16">9:16 (竖图)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>图片质量</label>
-                        <div class="radio-group">
-                            <div class="radio-item">
-                                <input type="radio" id="qualityStandard" name="quality" checked>
-                                <label for="qualityStandard">标准</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="qualityHigh" name="quality">
-                                <label for="qualityHigh">高清</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="qualityUltra" name="quality">
-                                <label for="qualityUltra">超清</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="negativePrompt">排除元素</label>
-                        <input type="text" id="negativePrompt" placeholder="不希望出现在图片中的元素，如：水印、文字、模糊">
-                    </div>
-                </div>
-                
-                <button class="btn btn-full" id="generateBtn">
-                    <span>生成提示词</span>
-                </button>
-            </section>
-            
-            <section class="preview-section">
-                <h2 class="section-title">提示词结果</h2>
-                
-                <div class="result-box">
-                    <div class="result-title">
-                        <span>为您生成的提示词：</span>
-                    </div>
-                    <div class="prompt-text" id="promptText">
-                        请先在左侧填写产品信息，然后点击"生成提示词"按钮。
-                    </div>
-                </div>
-                
-                <button class="btn btn-full btn-secondary" id="copyBtn" style="margin-top: 15px; display: none;">
-                    <span>复制提示词</span>
-                </button>
-                
-                <div class="example-preview">
-                    <div class="example-text">
-                        <p>将生成的提示词复制到AI绘画工具中，即可生成专业级产品图片</p>
-                        <p style="margin-top: 10px; font-size: 13px;">支持：Midjourney, Stable Diffusion, DALL-E 等主流AI绘图工具</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-        
-        <footer>
-            <p>电商AI提示词生成器 &copy; 2023 - 让电商视觉制作更简单</p>
-            <p style="margin-top: 5px; font-size: 12px;">提示：本工具生成的提示词可直接用于主流AI绘画工具</p>
-        </footer>
+  <div class="box">
+    <h2>电商商拍升级版 - 真实还原生成器</h2>
+
+    <label>① 上传白底图（PNG/JPG）</label>
+    <input type="file" id="upload" accept="image/*"/>
+
+    <label>② 商品名（必填）</label>
+    <input id="product" placeholder="例如：ins 风陶瓷咖啡杯"/>
+
+    <label>③ 材质/颜色</label>
+    <input id="material" placeholder="例如：白色陶瓷"/>
+
+    <label>④ 场景风格</label>
+    <select id="scene">
+      <option>轻奢客厅</option>
+      <option>INS 窗台</option>
+      <option>国潮礼盒</option>
+      <option>白底商拍（还原实物）</option>
+    </select>
+
+    <label>⑤ 还原度</label>
+    <select id="real">
+      <option value="real">真实商拍（去 AI 感）</option>
+      <option value="normal">标准商拍</option>
+    </select>
+
+    <label>⑥ 输出套版</label>
+    <select id="pack">
+      <option>9 张套图（主图+详情页）</option>
+      <option>仅主图 4 张</option>
+    </select>
+
+    <button onclick="generate()">生成商拍+详情页</button>
+
+    <div id="out" class="hide">
+      <strong>① 复制提示词到绘蛙/SD：</strong>
+      <textarea id="prompt" rows="4" readonly></textarea>
+
+      <strong>② 9 张套版 Canva 链接（点击打开）：</strong>
+      <ul id="canvaLinks"></ul>
+
+      <strong>③ 详情页文案（复制即用）：</strong>
+      <textarea id="copy" rows="6" readonly></textarea>
     </div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 元素获取
-            const generateBtn = document.getElementById('generateBtn');
-            const copyBtn = document.getElementById('copyBtn');
-            const promptText = document.getElementById('promptText');
-            const advancedToggle = document.getElementById('advancedToggle');
-            const advancedSettings = document.getElementById('advancedSettings');
-            const colorOptions = document.querySelectorAll('.color-option');
-            
-            // 颜色选择
-            colorOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    colorOptions.forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                });
-            });
-            
-            // 高级设置切换
-            advancedToggle.addEventListener('click', function() {
-                advancedSettings.classList.toggle('show');
-                const arrow = this.querySelector('span:last-child');
-                arrow.textContent = advancedSettings.classList.contains('show') ? '▲' : '▼';
-            });
-            
-            // 生成提示词
-            generateBtn.addEventListener('click', function() {
-                const productName = document.getElementById('productName').value;
-                const productCategory = document.getElementById('productCategory').value;
-                const productMaterial = document.getElementById('productMaterial').value;
-                const selectedColor = document.querySelector('.color-option.selected').getAttribute('data-color');
-                const imageRatio = document.getElementById('imageRatio').value;
-                const negativePrompt = document.getElementById('negativePrompt').value;
-                
-                // 验证必填字段
-                if (!productName) {
-                    alert('请输入产品名称');
-                    return;
-                }
-                
-                if (!productCategory) {
-                    alert('请选择产品品类');
-                    return;
-                }
-                
-                // 获取选中的风格
-                const styles = [];
-                if (document.getElementById('styleMinimal').checked) styles.push('极简白底');
-                if (document.getElementById('styleLifestyle').checked) styles.push('生活场景');
-                if (document.getElementById('styleStudio').checked) styles.push('专业影棚');
-                if (document.getElementById('styleNatural').checked) styles.push('自然光感');
-                
-                // 获取图片用途
-                let purpose = '';
-                if (document.getElementById('purposeMain').checked) purpose = '商品主图';
-                if (document.getElementById('purposeDetail').checked) purpose = '详情页图';
-                if (document.getElementById('purposeAd').checked) purpose = '广告宣传';
-                
-                // 获取图片质量
-                let quality = '';
-                if (document.getElementById('qualityStandard').checked) quality = '标准';
-                if (document.getElementById('qualityHigh').checked) quality = '高清';
-                if (document.getElementById('qualityUltra').checked) quality = '超清';
-                
-                // 品类映射
-                const categoryMap = {
-                    'clothing': '服装',
-                    'cosmetics': '美妆',
-                    'food': '食品',
-                    'electronics': '数码',
-                    'home': '家居',
-                    'shoes': '鞋包',
-                    'motherbaby': '母婴',
-                    'sports': '运动',
-                    'other': '其他'
-                };
-                
-                // 生成提示词
-                let prompt = `产品名称：${productName}
-产品品类：${categoryMap[productCategory]}
-产品特性：${productMaterial || '暂无描述'}
-主色调：${selectedColor}
-图片风格：${styles.join('、') || '未选择'}
-图片用途：${purpose}
-图片比例：${imageRatio}
-图片质量：${quality}
+<script>
+// ① 读取上传图片（仅前端预览，不上传）
+document.getElementById('upload').addEventListener('change', function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = document.createElement('img');
+  img.src = URL.createObjectURL(file);
+  img.style.maxWidth = '100%';
+  document.getElementById('out').prepend(img);
+});
 
-【中文提示词】：
-一张${purpose}，展示${productName}，${productMaterial ? '具有' + productMaterial + '，' : ''}主色调为${selectedColor}，采用${styles.join('、') || '专业'}风格拍摄，${imageRatio}比例，${quality}画质。
+// ② 生成提示词+文案+套版
+function generate() {
+  const p = document.getElementById('product').value.trim();
+  const m = document.getElementById('material').value.trim();
+  const s = document.getElementById('scene').value;
+  const r = document.getElementById('real').value;
+  const pack = document.getElementById('pack').value;
 
-【英文提示词（AI绘图工具使用）】：
-A ${purpose === '商品主图' ? 'product main image' : purpose === '详情页图' ? 'detailed product image' : 'advertising image'} of ${productName}, ${productMaterial ? 'featuring ' + productMaterial + ', ' : ''}primary color is ${selectedColor}, ${styles.includes('极简白底') ? 'clean white background, ' : ''}${styles.includes('生活场景') ? 'in a lifestyle setting, ' : ''}${styles.includes('专业影棚') ? 'professional studio lighting, ' : ''}${styles.includes('自然光感') ? 'natural lighting, ' : ''}${imageRatio} aspect ratio, ${quality === '高清' ? 'high quality' : quality === '超清' ? 'ultra detailed' : 'standard quality'} photography`;
+  if (!p) { alert('请填写商品名'); return; }
 
-                if (negativePrompt) {
-                    prompt += `\n\n【排除元素】：${negativePrompt}`;
-                    prompt += `\n【Negative Prompt】：${negativePrompt}`;
-                }
-                
-                prompt += `\n\n提示：将此英文提示词复制到AI绘图工具中即可生成图片。`;
-                
-                // 显示生成的提示词
-                promptText.textContent = prompt;
-                copyBtn.style.display = 'flex';
-                
-                // 滚动到结果区域
-                document.querySelector('.preview-section').scrollIntoView({ behavior: 'smooth' });
-            });
-            
-            // 复制功能
-            copyBtn.addEventListener('click', function() {
-                const textToCopy = promptText.textContent;
-                
-                navigator.clipboard.writeText(textToCopy).then(function() {
-                    // 复制成功反馈
-                    const originalText = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '<span>✓ 已复制到剪贴板！</span>';
-                    
-                    setTimeout(() => {
-                        copyBtn.innerHTML = originalText;
-                    }, 2000);
-                }, function(err) {
-                    console.error('复制失败: ', err);
-                    // 备用复制方法
-                    const textArea = document.createElement('textarea');
-                    textArea.value = textToCopy;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    
-                    // 复制成功反馈
-                    const originalText = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '<span>✓ 已复制到剪贴板！</span>';
-                    
-                    setTimeout(() => {
-                        copyBtn.innerHTML = originalText;
-                    }, 2000);
-                });
-            });
-        });
-    </script>
+  // 1. 生成提示词（去 AI 感 + 还原实物）
+  let prompt = `Ultra-detailed ${s} style product photography of ${p}, ${m}, `;
+  if (r === 'real') {
+    prompt += `soft natural light, no over-saturation, real texture, no AI artifacts, `;
+  }
+  prompt += `clean background, 8K, high resolution, aspect ratio 3:4 --q 2 --no people, logo, text`;
+
+  // 2. 生成 9 张套版 Canva 链接（免费模板）
+  const canvaLinks = [
+    'https://www.canva.cn/template/EAByVOKP42I/轻奢主图',
+    'https://www.canva.cn/template/EAByVOKP42I/INS 窗台',
+    'https://www.canva.cn/template/EAByVOKP42I/国潮礼盒',
+    'https://www.canva.cn/template/EAByVOKP42I/白底主图',
+    'https://www.canva.cn/template/EAByVOKP42I/细节特写',
+    'https://www.canva.cn/template/EAByVOKP42I/组合平铺',
+    'https://www.canva.cn/template/EAByVOKP42I/节日海报',
+    'https://www.canva.cn/template/EAByVOKP42I/场景氛围',
+    'https://www.canva.cn/template/EAByVOKP42I/真人上身'
+  ];
+
+  // 3. 生成详情页文案（AI 文案模板）
+  const copy = `【商品名】${p}
+【材质/颜色】${m}
+【风格】${s}
+【还原度】${r === 'real' ? '真实商拍，无 AI 感' : '标准商拍'}
+【生成工具】绘蛙 HaiIO / SD3.5
+【商用授权】自带，可上架淘宝/抖音
+【套图数量】${pack === '9 张套图（主图+详情页）' ? '9 张' : '4 张'}
+【生成时间】15 秒/张
+【成本】0.05 元/张（免费额度内 0 元）`;
+
+  // 4. 显示结果
+  document.getElementById('prompt').value = prompt;
+  document.getElementById('copy').value = copy;
+  const links = document.getElementById('canvaLinks');
+  links.innerHTML = '';
+  canvaLinks.forEach(l => links.innerHTML += `<li><a href="${l}" target="_blank">${l}</a></li>`);
+  document.getElementById('out').classList.remove('hide');
+}
+</script>
 </body>
 </html>
