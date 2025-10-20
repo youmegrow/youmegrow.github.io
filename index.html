@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI提示词生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .result h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        #generatedPrompt {
+            white-space: pre-line;
+            line-height: 1.6;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #eee;
+        }
+        
+        .copy-btn {
+            background: #27ae60;
+            width: auto;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #219653;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI提示词生成器</h1>
+            <p class="description">简单填写产品信息，生成高质量的AI提示词</p>
+        </header>
+        
+        <form id="promptForm">
+            <div class="form-group">
+                <label for="productName">产品名称</label>
+                <input type="text" id="productName" placeholder="例如：智能空气净化器" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="productType">产品类型</label>
+                <select id="productType">
+                    <option value="电子产品">电子产品</option>
+                    <option value="家居用品">家居用品</option>
+                    <option value="美妆护肤">美妆护肤</option>
+                    <option value="食品饮料">食品饮料</option>
+                    <option value="服装配饰">服装配饰</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="targetAudience">目标用户群体</label>
+                <input type="text" id="targetAudience" placeholder="例如：年轻白领、家庭主妇">
+            </div>
+            
+            <div class="form-group">
+                <label for="keyFeatures">主要功能/特点</label>
+                <textarea id="keyFeatures" rows="3" placeholder="请描述产品的主要功能和特点"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>提示词风格</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="styleProfessional" checked>
+                        <label for="styleProfessional">专业详细</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="styleCreative">
+                        <label for="styleCreative">创意生动</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="styleSimple">
+                        <label for="styleSimple">简洁明了</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="outputFormat">输出格式</label>
+                <select id="outputFormat">
+                    <option value="description">产品描述</option>
+                    <option value="adCopy">广告文案</option>
+                    <option value="socialMedia">社交媒体文案</option>
+                    <option value="seo">SEO优化内容</option>
+                </select>
+            </div>
+            
+            <button type="button" id="generateBtn">生成提示词</button>
+        </form>
+        
+        <div class="result" id="resultSection" style="display: none;">
+            <h3>生成的提示词：</h3>
+            <div id="generatedPrompt"></div>
+            <button class="copy-btn" id="copyBtn">复制提示词</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 AI提示词生成器 | 使用Gitee Pages部署</p>
+    </footer>
+
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            // 获取表单数据
+            const productName = document.getElementById('productName').value;
+            const productType = document.getElementById('productType').value;
+            const targetAudience = document.getElementById('targetAudience').value;
+            const keyFeatures = document.getElementById('keyFeatures').value;
+            const outputFormat = document.getElementById('outputFormat').value;
+            
+            // 获取选中的风格
+            const styles = [];
+            if (document.getElementById('styleProfessional').checked) styles.push('专业详细');
+            if (document.getElementById('styleCreative').checked) styles.push('创意生动');
+            if (document.getElementById('styleSimple').checked) styles.push('简洁明了');
+            
+            // 验证必填字段
+            if (!productName) {
+                alert('请输入产品名称');
+                return;
+            }
+            
+            // 根据输出格式生成不同的提示词
+            let prompt = '';
+            
+            if (outputFormat === 'description') {
+                prompt = `请为${productName}（${productType}类产品）创建一个详细的产品描述。
+                
+目标用户：${targetAudience || '普通消费者'}
+产品特点：${keyFeatures || '请根据产品名称推测其主要功能'}
+风格要求：${styles.join('、')}
+
+请按照以下结构组织内容：
+1. 产品概述
+2. 核心功能
+3. 使用场景
+4. 产品优势
+5. 技术规格（如适用）
+
+要求：语言专业、描述准确、突出产品价值，字数在300-500字之间。`;
+            } else if (outputFormat === 'adCopy') {
+                prompt = `请为${productName}创作一则吸引人的广告文案。
+                
+产品类型：${productType}
+目标人群：${targetAudience || '广大消费者'}
+产品卖点：${keyFeatures || '请根据产品名称推测其主要卖点'}
+风格要求：${styles.join('、')}
+
+文案要求：
+- 有吸引力的标题
+- 突出产品独特卖点
+- 激发购买欲望
+- 包含明确的行动号召
+- 字数在150-300字之间
+
+请确保文案生动、有感染力，能够打动目标消费者。`;
+            } else if (outputFormat === 'socialMedia') {
+                prompt = `请为${productName}创作适合社交媒体传播的文案。
+                
+产品类型：${productType}
+目标受众：${targetAudience || '社交媒体用户'}
+产品亮点：${keyFeatures || '请根据产品名称推测其主要亮点'}
+风格要求：${styles.join('、')}
+
+要求：
+- 适合在微信、微博、小红书等平台发布
+- 使用网络流行语和表情符号（适量）
+- 突出产品特色和用户利益点
+- 鼓励用户互动和分享
+- 字数在100-200字之间
+
+请确保文案轻松活泼、易于传播。`;
+            } else if (outputFormat === 'seo') {
+                prompt = `请为${productName}创建SEO优化的网页内容。
+                
+产品类别：${productType}
+目标关键词：${productName}及相关衍生词
+目标用户：${targetAudience || '网络搜索用户'}
+产品特性：${keyFeatures || '请根据产品名称推测其主要特性'}
+风格要求：${styles.join('、')}
+
+要求：
+- 自然地融入关键词
+- 内容信息丰富、有价值
+- 结构清晰，使用小标题
+- 包含产品优势和使用指南
+- 字数在500-800字之间
+
+请确保内容对搜索引擎友好，同时为用户提供实用信息。`;
+            }
+            
+            // 显示生成的提示词
+            document.getElementById('generatedPrompt').textContent = prompt;
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 滚动到结果区域
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // 复制功能
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const promptText = document.getElementById('generatedPrompt').textContent;
+            navigator.clipboard.writeText(promptText).then(function() {
+                alert('提示词已复制到剪贴板！');
+            }, function(err) {
+                console.error('复制失败: ', err);
+                // 备用复制方法
+                const textArea = document.createElement('textarea');
+                textArea.value = promptText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('提示词已复制到剪贴板！');
+            });
+        });
+    </script>
+</body>
+</html>
